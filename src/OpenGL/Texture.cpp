@@ -28,9 +28,9 @@ void OpenGL::Texture::image(int mipmap, int internalFormat, int width, int heigh
     glTexImage2D(GL_TEXTURE_2D, mipmap, internalFormat, width, height, 0, format, type, data);
 }
 
-#include <SFML/Graphics/Image.hpp>
+#include <Image.hpp>
 
-void OpenGL::Texture::image(int mipmap, const sf::Image& image) noexcept
+void OpenGL::Texture::image(int mipmap, const tcx::Image& image) noexcept
 {
-    glTexImage2D(GL_TEXTURE_2D, mipmap, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
+    glTexImage2D(GL_TEXTURE_2D, mipmap, GL_RGBA, image.size().x, image.size().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
 }

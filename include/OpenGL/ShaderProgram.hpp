@@ -45,4 +45,4 @@ public:
 
 } // namespace OpenGL
 
-#include "ShaderProgramUniforms.hpp"
+#include "ShaderProgramUniforms.inl"

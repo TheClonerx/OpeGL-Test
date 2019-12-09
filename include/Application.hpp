@@ -1,30 +1,28 @@
 #pragma once
+#include <Image.hpp>
 #include <OpenGL/Buffer.hpp>
-#include <OpenGL/GL.hpp>
 #include <OpenGL/ShaderProgram.hpp>
 #include <OpenGL/Texture.hpp>
 #include <OpenGL/VertexArray.hpp>
-#include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <Window.hpp>
+
+class GameWindow : public tcx::Window {
+    inline void on_window_resize(glm::ivec2 new_size) override
+    {
+        glViewport(0, 0, new_size.x, new_size.y);
+    }
+};
 
 class Application {
 public:
-    void start();
-
-protected:
     void render();
     void update(double);
-    void processEvent(const sf::Event&);
+    void setup();
+    tcx::Window& window() noexcept;
+    bool needs_redraw() const noexcept;
 
-    void setWindowTitle(std::string);
-    const std::string& getWindowTitle() const;
-
-    void toggleFullscreen();
-    void createWindow(sf::Vector2u, std::string, uint32_t);
-
-    void setupWindow();
+private:
     void setupOpenGL();
-    void loop();
 
 private:
     OpenGL::ShaderProgram shader_program;
@@ -32,17 +30,10 @@ private:
     OpenGL::Buffer<GL_ARRAY_BUFFER> vertex_buffer;
     OpenGL::Buffer<GL_ELEMENT_ARRAY_BUFFER> element_buffer;
     OpenGL::Texture texture1;
-
-    sf::Image m_tcx_image;
+    tcx::Image m_tcx_image;
 
     // window stuff
-    sf::RenderWindow m_window;
+    GameWindow m_window;
 
-    std::string m_window_title;
-    sf::Vector2u m_prev_size;
-    uint32_t m_prev_style;
-    bool is_fullscreen = false;
-
-    //sfml stuff
-    int sf_shader, sf_vao;
+    bool m_needs_redraw = true;
 };

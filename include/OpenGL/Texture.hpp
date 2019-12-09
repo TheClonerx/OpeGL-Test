@@ -2,9 +2,9 @@
 
 #include <OpenGL/Object.hpp>
 
-namespace sf {
+namespace tcx {
 class Image;
-}
+} // namespace tcx
 
 namespace OpenGL {
 
@@ -14,7 +14,7 @@ public:
         : Object {}
     {
     }
-    
+
     ~Texture();
 
     void create() noexcept final;
@@ -24,7 +24,7 @@ public:
     void parameter(int32_t name, int32_t value) noexcept;
 
     void image(int mipmap, int internalFormat, int width, int height, unsigned format, int type, const char* data) noexcept;
-    void image(int mipmap, const sf::Image& image) noexcept;
+    void image(int mipmap, const tcx::Image& image) noexcept;
 };
 
 } // namespace OpenGL

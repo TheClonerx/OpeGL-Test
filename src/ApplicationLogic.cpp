@@ -1,32 +1,17 @@
 #include "Application.hpp"
 #include <SFML/Window/Event.hpp>
 
-void Application::processEvent(const sf::Event& event)
-{
-    if (event.type == sf::Event::EventType::Closed)
-        m_window.close();
-    else if (event.type == sf::Event::EventType::Resized)
-        glViewport(0, 0, event.size.width, event.size.height);
-    else if (event.type == sf::Event::EventType::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Key::F11) {
-            toggleFullscreen();
-        }
-    }
-}
-
-#include <glm.hpp>
-
 static double elapsed;
 static float fov = 90.0f;
 
-#include <imgui.h>
+// #include <imgui.h>
 
 void Application::update(double delta)
 {
-    if (ImGui::Begin("Test")) {
-        ImGui::SliderAngle("FOV", &fov, 0);
-    }
-    ImGui::End();
+    // if (ImGui::Begin("Test")) {
+    //     ImGui::SliderAngle("FOV", &fov, 0);
+    // }
+    // ImGui::End();
     elapsed += delta;
 }
 
@@ -41,9 +26,12 @@ void Application::render()
     glActiveTexture(GL_TEXTURE0);
     texture1.bind();
 
+    glm::ivec4 viewport;
+    glGetIntegerv(GL_VIEWPORT, &viewport.x);
+
     glm::mat4 model = glm::rotate(glm::mat4 { 1.0 }, glm::radians(static_cast<float>(elapsed * 10)), glm::vec3 { 1.0, 0.0, 0.0 });
     glm::mat4 view = glm::translate(glm::mat4 { 1.0 }, glm::vec3 { 0.0, 0.0, -3.0 });
-    glm::mat4 projection = glm::perspectiveFov(glm::radians(fov), (float)m_window.getSize().x, (float)m_window.getSize().y, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspectiveFov(glm::radians(fov), static_cast<float>(viewport.z), static_cast<float>(viewport.w), 0.0f, 100.0f);
 
     shader_program.uniform("modelMatrix", model);
     shader_program.uniform("viewMatrix", view);
