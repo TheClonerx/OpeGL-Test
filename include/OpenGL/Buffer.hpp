@@ -37,7 +37,7 @@ public:
     auto data(It start, It stop, int usage) noexcept -> std::enable_if_t<std::is_trivially_copyable_v<typename std::iterator_traits<It>::value_type>>
     {
         if constexpr (std::is_pointer_v<It>) {
-            glBufferData(Target, reinterpret_cast<const char*>(stop) - reinterpret_cast<const char*>(start), start, usage);
+            glNamedBufferData(m_handle, reinterpret_cast<const char*>(stop) - reinterpret_cast<const char*>(start), start, usage);
         } else {
             std::vector<typename std::iterator_traits<It>::value_type> dat(start, stop);
             data(dat.data(), dat.data() + dat.size(), usage);

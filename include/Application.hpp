@@ -1,14 +1,15 @@
 #pragma once
+#include <ImGui/Window.hpp>
 #include <Image.hpp>
 #include <OpenGL/Buffer.hpp>
 #include <OpenGL/ShaderProgram.hpp>
 #include <OpenGL/Texture.hpp>
 #include <OpenGL/VertexArray.hpp>
-#include <Window.hpp>
 
-class GameWindow : public tcx::Window {
+class GameWindow : public ImGui::Window {
     inline void on_window_resize(glm::ivec2 new_size) override
     {
+        ImGui::Window::on_window_resize(new_size);
         glViewport(0, 0, new_size.x, new_size.y);
     }
 };
@@ -18,7 +19,7 @@ public:
     void render();
     void update(double);
     void setup();
-    tcx::Window& window() noexcept;
+    GLFW::Window& window() noexcept;
     bool needs_redraw() const noexcept;
 
 private:

@@ -11,7 +11,7 @@ bool tcx::Image::loadFromFile(std::string_view path)
     int x, y, channels;
     const uint8_t* data = stbi_load(path.data(), &x, &y, &channels, 4);
     if (!data) {
-        std::cerr << "ERROR:STB:" << stbi_failure_reason() << '\n';
+        std::cerr << "ERROR:STB:IMAGE:" << stbi_failure_reason() << '\n';
         return false;
     }
 

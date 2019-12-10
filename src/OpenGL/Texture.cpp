@@ -23,7 +23,7 @@ void OpenGL::Texture::parameter(int32_t name, int32_t value) noexcept
     glTexParameteri(GL_TEXTURE_2D, name, value);
 }
 
-void OpenGL::Texture::image(int mipmap, int internalFormat, int width, int height, unsigned format, int type, const char* data) noexcept
+void OpenGL::Texture::image(int mipmap, int internalFormat, int width, int height, unsigned format, int type, const uint8_t* data) noexcept
 {
     glTexImage2D(GL_TEXTURE_2D, mipmap, internalFormat, width, height, 0, format, type, data);
 }

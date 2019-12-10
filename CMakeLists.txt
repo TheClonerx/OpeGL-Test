@@ -22,15 +22,14 @@ target_sources(OpenGL-Utils PRIVATE
     src/OpenGL/Texture.cpp
 )
 
-
 add_library(GLFW-Utils STATIC)
 target_compile_features(GLFW-Utils PUBLIC cxx_std_17)
 target_include_directories(GLFW-Utils PUBLIC include)
 target_link_libraries(GLFW-Utils PUBLIC glfw GLEW::GLEW)
 target_sources(GLFW-Utils PRIVATE
-    src/Window.cpp
-    src/WindowDefaults.cpp
-    src/WindowEvents.cpp
+    src/GLFW/Window.cpp
+    src/GLFW/WindowDefaults.cpp
+    src/GLFW/WindowEvents.cpp
 )
 
 add_library(Assets-Utils STATIC)
@@ -40,10 +39,19 @@ target_sources(Assets-Utils PRIVATE
     src/Image.cpp
 )
 
+add_library(ImGui-Bindings STATIC)
+target_compile_features(ImGui-Bindings PUBLIC cxx_std_17)
+target_include_directories(ImGui-Bindings PUBLIC include)
+target_link_libraries(ImGui-Bindings PUBLIC imgui::imgui OpenGL-Utils)
+target_sources(ImGui-Bindings PRIVATE
+    src/ImGui/Window.cpp
+    src/ImGui/OpenGL.cpp
+)
+
 add_executable(main)
 target_compile_features(main PRIVATE cxx_std_17)
 target_include_directories(main PRIVATE include)
-target_link_libraries(main PRIVATE OpenGL-Utils GLFW-Utils Assets-Utils)
+target_link_libraries(main PRIVATE OpenGL-Utils GLFW-Utils Assets-Utils ImGui-Bindings)
 target_sources(main PRIVATE
     src/main.cpp 
     src/Application.cpp

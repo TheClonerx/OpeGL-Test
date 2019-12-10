@@ -9,9 +9,10 @@
 struct GLFWwindow;
 
 namespace tcx {
-
 class Image;
+} // namespace tcx
 
+namespace GLFW {
 class Window {
 
 public:
@@ -35,11 +36,17 @@ public:
     void display();
     void update();
     void makeContextCurrent();
-    void setIcon(const Image&);
+    void setIcon(const tcx::Image&);
     glm::ivec2 size() const noexcept;
 
     // events
 
+    virtual void on_create();
+    virtual void on_update();
+    virtual void before_update();
+    virtual void on_close();
+    virtual void on_mouse_button_press(int, int);
+    virtual void on_mouse_button_release(int, int);
     virtual void on_key_press(int key, int mod);
     virtual void on_key_release(int key, int mod);
     virtual void on_key_repeat(int key, int mod);
@@ -50,8 +57,8 @@ public:
     virtual void on_window_move(glm::ivec2 new_pos);
     virtual void on_window_resize(glm::ivec2 new_size);
 
-private:
+protected:
     GLFWwindow* m_impl_window = nullptr;
 };
 
-} // namespace tcx
+} // namespace GLFW

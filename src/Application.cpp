@@ -9,42 +9,6 @@
 
 using namespace std::literals;
 
-// void Application::loop()
-// {
-//     sf::Event event;
-//     sf::Clock clock;
-//     ImGui::SFML::Init(m_window, static_cast<sf::Vector2f>(m_window.getSize()));
-//     while (m_window.isOpen()) {
-//         const sf::Time sf_delta = clock.restart();
-//         const double delta = sf_delta.asMicroseconds() / 1'000'000.0;
-//         while (m_window.pollEvent(event)) {
-//             ImGui::SFML::ProcessEvent(event);
-//             this->processEvent(event);
-//         }
-//         ImGui::SFML::Update(sf::Mouse::getPosition(m_window), static_cast<sf::Vector2f>(m_window.getSize()), sf_delta);
-//         this->update(delta);
-//         this->render();
-//         ImGui::SFML::Render();
-//         m_window.display();
-//     }
-//     ImGui::SFML::Shutdown();
-// }
-
-// void Application::setupWindow()
-// {
-//     createWindow({ 800, 600 }, "OpenGL-Test", sf::Style::Close | sf::Style::Resize);
-
-//     m_window.setKeyRepeatEnabled(false);
-//     m_window.setFramerateLimit(144);
-//     m_window.setVerticalSyncEnabled(true);
-//     m_window.setActive();
-
-//     if (int error = glewInit(); error != GLEW_OK) {
-//         std::cerr << "Error initializing GLEW\n";
-//         std::cerr << glewGetErrorString(error) << "\n";
-//     }
-// }
-
 static void GLAPIENTRY MessageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message, const void* param)
 {
     std::cerr << "GL CALLBACK: ";
@@ -66,9 +30,15 @@ std::string get_file(const std::string& path)
     return content;
 }
 
-tcx::Window& Application::window() noexcept { return m_window; }
+GLFW::Window& Application::window() noexcept
+{
+    return m_window;
+}
 
-bool Application::needs_redraw() const noexcept { return m_needs_redraw; }
+bool Application::needs_redraw() const noexcept
+{
+    return m_needs_redraw;
+}
 
 void Application::setupOpenGL()
 {
@@ -126,8 +96,11 @@ void Application::setupOpenGL()
     vertex_buffer.bind();
     vertex_buffer.data(vertices, GL_STATIC_DRAW);
 
+    element_buffer.bind();
+    element_buffer.data(indices, GL_STATIC_DRAW);
+
     // coords (x, y, z)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, pos)));
     glEnableVertexAttribArray(0);
 
     // color (r, g, b, a)
@@ -138,9 +111,6 @@ void Application::setupOpenGL()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, uv)));
     glEnableVertexAttribArray(2);
 
-    element_buffer.bind();
-    element_buffer.data(indices, GL_STATIC_DRAW);
-
     texture1.create();
     texture1.bind();
     texture1.parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -149,8 +119,6 @@ void Application::setupOpenGL()
     texture1.parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     texture1.image(0, m_tcx_image);
-
-    shader_program.uniform("texture1", 0);
 }
 
 void Application::setup()
@@ -164,43 +132,5 @@ void Application::setup()
 
     m_tcx_image.flipVertically(); // for opengl
 
-    // setupWindow();
     setupOpenGL();
-
-    // loop();
 }
-
-// void Application::setWindowTitle(std::string title)
-// {
-//     m_window.setTitle(title);
-//     m_window_title = std::move(title);
-// }
-
-// const std::string& Application::getWindowTitle() const
-// {
-//     return m_window_title;
-// }
-
-// void Application::toggleFullscreen()
-// {
-//     m_window.close();
-//     if (is_fullscreen)
-//         m_window.create(sf::VideoMode { m_prev_size.x, m_prev_size.y }, m_window_title, m_prev_style);
-//     else
-//         m_window.create(sf::VideoMode::getFullscreenModes()[0], m_window_title, sf::Style::Fullscreen);
-//     m_window.setActive();
-//     is_fullscreen = !is_fullscreen;
-// }
-
-// void Application::createWindow(sf::Vector2u size, std::string title, uint32_t style)
-// {
-//     /*  sf::ContextSettings settings;
-//     settings.majorVersion = 3;
-//     settings.minorVersion = 3;
-//     settings.antialiasingLevel = 0; */
-
-//     m_window.create(sf::VideoMode { size.x, size.y }, title, style /* , settings */);
-//     m_prev_size = m_window.getSize();
-//     m_prev_style = style;
-//     m_window_title = std::move(title);
-// }

@@ -26,9 +26,10 @@ int main()
 
             if (app.needs_redraw()) {
                 app.render();
-                app.window().display();
             }
+
             app.window().update();
+            app.window().display();
 
             double now = glfwGetTime();
             delta = now - last_update;

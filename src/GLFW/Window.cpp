@@ -1,52 +1,58 @@
-#include <GL/glew.h>
+#include <OpenGL/GL.hpp>
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/Window.hpp>
 #include <GLFW/glfw3.h>
 #include <Image.hpp>
-#include <Window.hpp>
 #include <utility>
 
-tcx::Window::Window(Window&& rhs) noexcept
+GLFW::Window::Window(Window&& rhs) noexcept
     : m_impl_window { std::exchange(rhs.m_impl_window, nullptr) }
 {
 }
 
-tcx::Window& tcx::Window::operator=(Window&& rhs) noexcept
+GLFW::Window& GLFW::Window::operator=(Window&& rhs) noexcept
 {
     m_impl_window = std::exchange(rhs.m_impl_window, nullptr);
     return *this;
 }
 
-tcx::Window::~Window()
+GLFW::Window::~Window()
 {
     destroy();
 }
 
-void tcx::Window::setIcon(const Image& image)
+void GLFW::Window::setIcon(const tcx::Image& image)
 {
     // glfwSetWindowIcon won't change the data so const_cast is safe
     GLFWimage glfw_image { image.size().x, image.size().y, const_cast<uint8_t*>(image.data()) };
     glfwSetWindowIcon(m_impl_window, 1, &glfw_image);
 }
 
-bool tcx::Window::is_open()
+bool GLFW::Window::is_open()
 {
     return m_impl_window;
 }
 
-void tcx::Window::update()
+void GLFW::Window::update()
 {
-    assert(is_open() && "The window isn't open");
+    if (!is_open())
+        return;
+    before_update();
+
     glfwPollEvents();
     if (glfwWindowShouldClose(m_impl_window))
         destroy();
+    on_update();
 }
 
-void tcx::Window::makeContextCurrent()
+void GLFW::Window::makeContextCurrent()
 {
     assert(is_open() && "The window isn't open");
     glfwMakeContextCurrent(m_impl_window);
 }
 
-void tcx::Window::destroy()
+void GLFW::Window::destroy()
 {
     if (m_impl_window) {
         glfwDestroyWindow(m_impl_window);
@@ -54,20 +60,22 @@ void tcx::Window::destroy()
     }
 }
 
-glm::ivec2 tcx::Window::size() const noexcept
+glm::ivec2 GLFW::Window::size() const noexcept
 {
     glm::ivec2 ret;
     glfwGetWindowSize(m_impl_window, &ret.x, &ret.y);
     return ret;
 }
 
-void tcx::Window::display()
+void GLFW::Window::display()
 {
-    assert(is_open() && "The window isn't open");
+    if (!is_open())
+        return;
+
     glfwSwapBuffers(m_impl_window);
 }
 
-void tcx::Window::create(glm::ivec2 size, std::string_view title)
+void GLFW::Window::create(glm::ivec2 size, std::string_view title)
 {
     assert(!is_open() && "Window is already open");
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -83,4 +91,5 @@ void tcx::Window::create(glm::ivec2 size, std::string_view title)
     makeContextCurrent();
     if (int error = glewInit(); error != GLEW_OK)
         throw std::runtime_error("ERROR:GLEW:" + std::to_string(error) + ":" + reinterpret_cast<const char*>(glewGetErrorString(error)));
+    on_create();
 }
