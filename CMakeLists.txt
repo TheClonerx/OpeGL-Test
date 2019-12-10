@@ -8,11 +8,12 @@ find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 
+add_definitions(-DGLFW_INCLUDE_NONE)
 
 add_library(OpenGL-Utils STATIC)
 target_compile_features(OpenGL-Utils PUBLIC cxx_std_17)
 target_include_directories(OpenGL-Utils PUBLIC include)
-target_link_libraries(OpenGL-Utils PUBLIC GLEW::GLEW OpenGL::OpenGL)
+target_link_libraries(OpenGL-Utils PUBLIC GLEW::GLEW)
 target_sources(OpenGL-Utils PRIVATE
     src/OpenGL/Object.cpp
     src/OpenGL/Shader.cpp
@@ -25,7 +26,7 @@ target_sources(OpenGL-Utils PRIVATE
 add_library(GLFW-Utils STATIC)
 target_compile_features(GLFW-Utils PUBLIC cxx_std_17)
 target_include_directories(GLFW-Utils PUBLIC include)
-target_link_libraries(GLFW-Utils PUBLIC glfw GLEW::GLEW)
+target_link_libraries(GLFW-Utils PUBLIC glfw GLEW::GLEW glm)
 target_sources(GLFW-Utils PRIVATE
     src/GLFW/Window.cpp
     src/GLFW/WindowDefaults.cpp
@@ -35,6 +36,7 @@ target_sources(GLFW-Utils PRIVATE
 add_library(Assets-Utils STATIC)
 target_compile_features(Assets-Utils PUBLIC cxx_std_17)
 target_include_directories(Assets-Utils PUBLIC include libs/stb)
+target_link_libraries(Assets-Utils PUBLIC glm)
 target_sources(Assets-Utils PRIVATE
     src/Image.cpp
     src/Sound.cpp

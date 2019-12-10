@@ -1,5 +1,4 @@
-#include "Application.hpp"
-#include <SFML/Window/Event.hpp>
+#include <Application.hpp>
 #include <imgui.h>
 #include <iostream>
 

@@ -1,10 +1,9 @@
 #include <OpenGL/GL.hpp>
-
-#define GLFW_INCLUDE_NONE
 #include <GLFW/Window.hpp>
 #include <GLFW/glfw3.h>
 #include <Image.hpp>
 #include <utility>
+#include <string>
 
 GLFW::Window::Window(Window&& rhs) noexcept
     : m_impl_window { std::exchange(rhs.m_impl_window, nullptr) }
