@@ -37,6 +37,7 @@ target_compile_features(Assets-Utils PUBLIC cxx_std_17)
 target_include_directories(Assets-Utils PUBLIC include libs/stb)
 target_sources(Assets-Utils PRIVATE
     src/Image.cpp
+    src/Sound.cpp
 )
 
 add_library(ImGui-Bindings STATIC)
