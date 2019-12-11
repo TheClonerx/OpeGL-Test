@@ -18,7 +18,8 @@ public:
     void on_key_press(int key, int mods) override;
     void on_key_release(int key, int mods) override;
     void on_char(char32_t c) override;
-    void on_close();
+    void on_close() override;
+    void before_display() override;
 
 private:
     void update_mouse(ImGuiIO& io);

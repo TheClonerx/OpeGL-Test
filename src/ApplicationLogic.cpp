@@ -1,18 +1,30 @@
 #include <Application.hpp>
 #include <imgui.h>
 #include <iostream>
+#include <array>
 
 static double elapsed;
 static float fov = glm::radians(90.0f);
+static int max_frame_rate = 60;
+static double last_frame;
 
 void Application::update(double delta)
 {
     if (ImGui::Begin("Test")) {
         ImGui::SliderAngle("FOV", &fov, 1);
+        ImGui::SliderInt("Max Frame Rate", &max_frame_rate, 5, 145, max_frame_rate == 145 ? " Unlimited" : "%d fps");
     }
     ImGui::End();
+
     elapsed += delta;
-    // std::cout << "Elapsed: " << elapsed << '\n';
+
+    if (max_frame_rate == 145 || elapsed - last_frame >= 1.0 / max_frame_rate) {
+        m_needs_redraw = true;
+        last_frame = elapsed;
+    }
+    else
+        m_needs_redraw = false;
+    
 }
 
 #include <glm/gtx/io.hpp>

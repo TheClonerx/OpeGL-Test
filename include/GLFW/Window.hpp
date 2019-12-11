@@ -42,8 +42,10 @@ public:
     // events
 
     virtual void on_create();
-    virtual void on_update();
     virtual void before_update();
+    virtual void on_update();
+    virtual void before_display();
+    virtual void on_display();
     virtual void on_close();
     virtual void on_mouse_button_press(int, int);
     virtual void on_mouse_button_release(int, int);

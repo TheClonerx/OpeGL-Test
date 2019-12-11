@@ -15,3 +15,5 @@ void GLFW::Window::on_update() {}
 void GLFW::Window::before_update() {}
 void GLFW::Window::on_create() {}
 void GLFW::Window::on_close() {}
+void GLFW::Window::before_display() {}
+void GLFW::Window::on_display() {}

@@ -1,4 +1,3 @@
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <ImGui/Window.hpp>
 
@@ -98,15 +97,19 @@ void ImGui::Window::on_create()
     ImGui::NewFrame();
 }
 
-void ImGui::Window::before_update()
-{
+void ImGui::Window::before_display() {
     ImGui::SetCurrentContext(m_imgui_context);
     ImGui::Render();
     if (auto data = ImGui::GetDrawData(); data) {
         makeContextCurrent();
         ImGui_RenderDrawData(data);
     }
-    ImGui::NewFrame();
+}
+
+void ImGui::Window::before_update()
+{
+    ImGui::SetCurrentContext(m_imgui_context);
+    ImGui::EndFrame();
 }
 
 void ImGui::Window::on_update()
@@ -128,6 +131,8 @@ void ImGui::Window::on_update()
 
     update_mouse(io);
     update_cursor(io);
+
+    ImGui::NewFrame();
 }
 
 void ImGui::Window::update_mouse(ImGuiIO& io)

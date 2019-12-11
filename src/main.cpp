@@ -21,16 +21,14 @@ int main()
         double last_update = glfwGetTime();
         double delta = 0;
 
-        while (app.window().is_open()) {
+        for (;app.window().is_open(); app.window().update()) {
             app.update(delta);
-
+            
             if (app.needs_redraw()) {
                 app.render();
+                app.window().display();
             }
-
-            app.window().update();
-            app.window().display();
-
+            
             double now = glfwGetTime();
             delta = now - last_update;
             last_update = now;

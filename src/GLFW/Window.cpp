@@ -70,8 +70,9 @@ void GLFW::Window::display()
 {
     if (!is_open())
         return;
-
+    before_display();
     glfwSwapBuffers(m_impl_window);
+    on_display();
 }
 
 void GLFW::Window::create(glm::ivec2 size, std::string_view title)
