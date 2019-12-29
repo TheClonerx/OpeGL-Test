@@ -13,7 +13,7 @@ add_definitions(-DGLFW_INCLUDE_NONE)
 add_library(OpenGL-Utils STATIC)
 target_compile_features(OpenGL-Utils PUBLIC cxx_std_17)
 target_include_directories(OpenGL-Utils PUBLIC include)
-target_link_libraries(OpenGL-Utils PUBLIC GLEW::GLEW)
+target_link_libraries(OpenGL-Utils PUBLIC GLEW::GLEW OpenGL::OpenGL)
 target_sources(OpenGL-Utils PRIVATE
     src/OpenGL/Object.cpp
     src/OpenGL/Shader.cpp

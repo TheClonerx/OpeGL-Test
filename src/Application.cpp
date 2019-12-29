@@ -9,19 +9,19 @@
 
 using namespace std::literals;
 
-static void GLAPIENTRY MessageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message, const void* param)
+static void GLAPIENTRY MessageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char *message, const void *param)
 {
     std::cerr << "GL CALLBACK: ";
     if (type == GL_DEBUG_TYPE_ERROR)
         std::cerr << "\033[31m\033[5m\033[1m** GL ERROR **\033[0m\033[39m ";
     std::cerr << "type = 0x" << std::hex << type;
     std::cerr << " severity = 0x" << severity;
-    std::cerr << "\n\t" << std::string_view { message, static_cast<std::size_t>(length) } << '\n';
+    std::cerr << "\n\t" << std::string_view{message, static_cast<std::size_t>(length)} << '\n';
 }
 
-std::string get_file(const std::string& path)
+std::string get_file(const std::string &path)
 {
-    std::ifstream file { path.c_str() };
+    std::ifstream file{path.c_str()};
     if (!file.is_open())
         throw std::runtime_error("Can't open file " + path);
     auto file_size = std::filesystem::file_size(path);
@@ -30,7 +30,7 @@ std::string get_file(const std::string& path)
     return content;
 }
 
-GLFW::Window& Application::window() noexcept
+GLFW::Window &Application::window() noexcept
 {
     return m_window;
 }
@@ -69,23 +69,45 @@ void Application::setupOpenGL()
     if (!shader_program.link())
         std::cerr << "Error linking the shader program:\n\t" << shader_program.info_log() << '\n';
 
-    struct Vertex {
+    struct Vertex
+    {
         glm::vec3 pos;
         glm::u8vec4 color;
         glm::vec2 uv;
     };
 
-    Vertex vertices[] {
-        { { -0.5, -0.5, +0.0 }, { 255u, 255u, 255u, 255u }, { 0.0, 0.0 } }, // bottom left
-        { { +0.5, -0.5, +0.0 }, { 255u, 255u, 255u, 255u }, { 1.0, 0.0 } }, // bottom right
-        { { +0.5, +0.5, +0.0 }, { 255u, 255u, 255u, 255u }, { 1.0, 1.0 } }, // top right
-        { { -0.5, +0.5, +0.0 }, { 255u, 255u, 255u, 255u }, { 0.0, 1.0 } } //  top left
+    Vertex vertices[]{
+        {{+0.0, +0.5, +0.0}, {255u, 255u, 255u, 255u}, {0.5, 1.0}},
+        {{-0.5, -0.5, -0.5}, {255u, 255u, 255u, 255u}, {0.0, 0.0}},
+        {{+0.5, -0.5, -0.5}, {255u, 255u, 255u, 255u}, {1.0, 0.0}},
+
+        {{+0.0, +0.5, +0.0}, {255u, 255u, 255u, 255u}, {0.5, 1.0}},
+        {{+0.5, -0.5, -0.5}, {255u, 255u, 255u, 255u}, {0.0, 0.0}},
+        {{+0.5, -0.5, +0.5}, {255u, 255u, 255u, 255u}, {1.0, 0.0}},
+
+        {{+0.0, +0.5, +0.0}, {255u, 255u, 255u, 255u}, {0.5, 1.0}},
+        {{+0.5, -0.5, +0.5}, {255u, 255u, 255u, 255u}, {0.0, 0.0}},
+        {{-0.5, -0.5, +0.5}, {255u, 255u, 255u, 255u}, {1.0, 0.0}},
+
+        {{+0.0, +0.5, +0.0}, {255u, 255u, 255u, 255u}, {0.5, 1.0}},
+        {{-0.5, -0.5, +0.5}, {255u, 255u, 255u, 255u}, {0.0, 0.0}},
+        {{-0.5, -0.5, -0.5}, {255u, 255u, 255u, 255u}, {1.0, 0.0}},
+
+        // base
+        {{-0.5, -0.5, +0.5}, {255u, 255u, 255u, 255u}, {0.0, 1.0}},
+        {{+0.5, -0.5, +0.5}, {255u, 255u, 255u, 255u}, {1.0, 1.0}},
+        {{-0.5, -0.5, -0.5}, {255u, 255u, 255u, 255u}, {0.0, 0.0}},
+        {{+0.5, -0.5, -0.5}, {255u, 255u, 255u, 255u}, {1.0, 0.0}},
     };
 
-    uint32_t indices[] {
-        0, 1, 2,
-        2, 3, 0
-    };
+    uint32_t indices[]{
+        0, 2, 1,
+        3, 5, 4,
+        6, 8, 7,
+        9, 11, 10,
+
+        11 + 1, 11 + 2, 11 + 3,
+        11 + 2, 11 + 4, 11 + 3};
 
     vertex_array.create();
     vertex_buffer.create();
@@ -100,15 +122,15 @@ void Application::setupOpenGL()
     element_buffer.data(indices, GL_STATIC_DRAW);
 
     // coords (x, y, z)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, pos)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)(offsetof(Vertex, pos)));
     glEnableVertexAttribArray(0);
 
     // color (r, g, b, a)
-    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (const void*)(offsetof(Vertex, color)));
+    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (const void *)(offsetof(Vertex, color)));
     glEnableVertexAttribArray(1);
 
     // texture coords (u, v)
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, uv)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void *)(offsetof(Vertex, uv)));
     glEnableVertexAttribArray(2);
 
     texture1.create();
@@ -118,19 +140,23 @@ void Application::setupOpenGL()
     texture1.parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture1.parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    texture1.image(0, m_tcx_image);
+    texture1.image(0, m_pinera);
 }
 
 void Application::setup()
 {
-    m_window.create({ 800, 600 }, "OpenGL-Test");
+    m_window.create({800, 600}, "OpenGL-Test");
     m_window.makeContextCurrent();
-    if (!m_tcx_image.loadFromFile("theclonerx.png"))
-        throw std::runtime_error("Can't load tcx image");
+    if (!m_tcx_image.loadFromFile("assets/theclonerx.png"))
+        throw std::runtime_error("Can't load theclonerx image");
+
+    if (!m_pinera.loadFromFile("assets/avatar-pinera.png"))
+        throw std::runtime_error("Can't load pinera image");
 
     m_window.setIcon(m_tcx_image);
 
     m_tcx_image.flipVertically(); // for opengl
+    m_pinera.flipVertically();
 
     setupOpenGL();
 }

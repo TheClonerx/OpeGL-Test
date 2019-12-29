@@ -32,6 +32,7 @@ private:
     OpenGL::Buffer<GL_ELEMENT_ARRAY_BUFFER> element_buffer;
     OpenGL::Texture texture1;
     tcx::Image m_tcx_image;
+    tcx::Image m_pinera;
 
     // window stuff
     GameWindow m_window;
