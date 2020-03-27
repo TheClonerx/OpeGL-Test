@@ -1,51 +1,76 @@
-#include <OpenGL/GL.hpp> // must be included before glfw
-
 #include <Application.hpp>
-#include <GLFW/glfw3.h>
+#include <OpenGL/GL.hpp>
+#include <SFML/Window/Event.hpp>
+#include <chrono>
 #include <iostream>
 
-[[noreturn]] static void glfwErrorCallback(int code, const char* str)
+template <typename Clock>
+static double now_as_seconds() noexcept
 {
-    throw std::runtime_error("ERROR:GLFW:" + std::to_string(code) + ":" + str);
+    return std::chrono::duration_cast<std::chrono::duration<double>>(Clock::now().time_since_epoch()).count();
 }
 
+#include <imgui-SFML.h>
+
 int main()
-{
+try {
+    using clock_t = std::conditional_t<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>;
 
-    try {
-        glfwSetErrorCallback(glfwErrorCallback);
-        glfwInit();
-        Application app;
-        app.setup();
+    Application app;
+    app.setup();
 
-        double last_update = glfwGetTime();
-        double delta = 0;
+    double last_update = now_as_seconds<clock_t>();
+    double delta = 0;
 
-        for (;app.window().is_open(); app.window().update()) {
-            app.update(delta);
-            
-            if (app.needs_redraw()) {
-                app.render();
-                app.window().display();
+    bool running = true;
+
+    while (running) {
+        sf::Event event;
+        while (app.window().pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(event);
+
+            app.on_event(event);
+
+            if (!app.window().isOpen()) { // window.close() may be called
+                running = false;
             }
-            
-            double now = glfwGetTime();
-            delta = now - last_update;
-            last_update = now;
+        }
+        if (!running)
+            break;
+
+        ImGui::SFML::Update(app.window(), sf::seconds(delta));
+
+        app.update(delta);
+        if (!running)
+            break;
+
+        bool needs_redraw = app.needs_redraw();
+
+        if (needs_redraw) {
+            //app.window().clear();
+            app.render();
         }
 
-        glfwTerminate();
+        app.window().popGLStates();
+        ImGui::SFML::Render(app.window());
+        app.window().pushGLStates();
 
-    } catch (std::system_error& e) {
-        std::cerr << "Unhandled std::system_error:\n\t";
-        std::cerr << e.code().category().name() << ": (" << e.code().value() << ") " << e.code().message() << std::endl;
-        exit(EXIT_FAILURE);
-    } catch (std::exception& e) {
-        std::cerr << "Unhandled std::exception:\n\t";
-        std::cerr << e.what() << std::endl;
-        exit(EXIT_FAILURE);
-    } catch (...) {
-        std::cerr << "Unhandled unknown exception, rethrowing." << std::endl;
-        throw;
+        if (needs_redraw)
+            app.window().display();
+
+        double now = now_as_seconds<clock_t>();
+        delta = now - last_update;
+        last_update = now;
     }
+} catch (std::system_error& e) {
+    std::cerr << "Unhandled std::system_error:\n\t";
+    std::cerr << e.code().category().name() << ": (" << e.code().value() << ") " << e.code().message() << std::endl;
+    exit(EXIT_FAILURE);
+} catch (std::exception& e) {
+    std::cerr << "Unhandled std::exception:\n\t";
+    std::cerr << e.what() << std::endl;
+    exit(EXIT_FAILURE);
+} catch (...) {
+    std::cerr << "Unhandled unknown exception, rethrowing." << std::endl;
+    throw;
 }

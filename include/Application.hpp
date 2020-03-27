@@ -1,25 +1,20 @@
 #pragma once
-#include <ImGui/Window.hpp>
-#include <Image.hpp>
+
 #include <OpenGL/Buffer.hpp>
 #include <OpenGL/ShaderProgram.hpp>
 #include <OpenGL/Texture.hpp>
 #include <OpenGL/VertexArray.hpp>
-
-class GameWindow : public ImGui::Window {
-    inline void on_window_resize(glm::ivec2 new_size) override
-    {
-        ImGui::Window::on_window_resize(new_size);
-        glViewport(0, 0, new_size.x, new_size.y);
-    }
-};
+#include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Event.hpp>
 
 class Application {
 public:
     void render();
     void update(double);
     void setup();
-    GLFW::Window& window() noexcept;
+    void on_event(const sf::Event&);
+    sf::RenderWindow& window() noexcept;
     bool needs_redraw() const noexcept;
 
 private:
@@ -31,11 +26,11 @@ private:
     OpenGL::Buffer<GL_ARRAY_BUFFER> vertex_buffer;
     OpenGL::Buffer<GL_ELEMENT_ARRAY_BUFFER> element_buffer;
     OpenGL::Texture texture1;
-    tcx::Image m_tcx_image;
-    tcx::Image m_pinera;
+    sf::Image m_tcx_image;
+    sf::Image m_pinera;
 
     // window stuff
-    GameWindow m_window;
+    sf::RenderWindow m_window;
 
     bool m_needs_redraw = true;
 };

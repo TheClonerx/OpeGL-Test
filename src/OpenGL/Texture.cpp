@@ -27,10 +27,3 @@ void OpenGL::Texture::image(int mipmap, int internalFormat, int width, int heigh
 {
     glTexImage2D(GL_TEXTURE_2D, mipmap, internalFormat, width, height, 0, format, type, data);
 }
-
-#include <Image.hpp>
-
-void OpenGL::Texture::image(int mipmap, const tcx::Image& image) noexcept
-{
-    glTexImage2D(GL_TEXTURE_2D, mipmap, GL_RGBA, image.size().x, image.size().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
-}

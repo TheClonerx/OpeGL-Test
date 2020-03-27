@@ -17,6 +17,21 @@ namespace impl {
         void source(std::string_view) noexcept;
         std::string source() const;
 
+        template <typename It>
+        auto source(It start, It stop) noexcept -> std::enable_if_t<std::is_convertible_v<decltype(*start), std::string_view>>
+        {
+            std::vector<const char*> chunks;
+            std::vector<int> chunk_sizes;
+
+            for (; start != stop; ++start) {
+                std::string_view chunk = *start;
+                chunks.push_back(chunk.data());
+                chunk_sizes.push_back(chunk.size());
+            }
+
+            glShaderSource(m_handle, chunks.size(), chunks.data(), chunk_sizes.data());
+        }
+
         int status() const noexcept;
         std::string info_log() const;
 
