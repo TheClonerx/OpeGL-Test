@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.15)
 project(OpenGL-Test)
 
 # find_package(fmt REQUIRED) # not yet needed
-find_package(GLEW REQUIRED) # use system one, building is a mess
 find_package(OpenGL REQUIRED) # use system one, there's basically no other choice
+
+set(ONLY_LIBS ON)
+set(BUILD_UTILS OFF)
+add_subdirectory(libs/glew-cmake)
 
 set(GLM_TEST_ENABLE OFF)
 add_subdirectory(libs/glm)
@@ -18,7 +21,7 @@ add_subdirectory(libs/imgui-sfml)
 add_library(OpenGL-Utils STATIC)
 target_compile_features(OpenGL-Utils PUBLIC cxx_std_17)
 target_include_directories(OpenGL-Utils PUBLIC include)
-target_link_libraries(OpenGL-Utils PUBLIC GLEW::GLEW OpenGL::OpenGL)
+target_link_libraries(OpenGL-Utils PUBLIC libglew_static OpenGL::OpenGL)
 target_sources(
     OpenGL-Utils
     PRIVATE src/OpenGL/Object.cpp src/OpenGL/Shader.cpp

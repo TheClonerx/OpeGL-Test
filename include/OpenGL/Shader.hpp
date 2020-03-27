@@ -1,8 +1,9 @@
 #pragma once
 #include "Object.hpp"
-#include <GL/glew.h>
+#include <OpenGL/GL.hpp>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace OpenGL {
 
