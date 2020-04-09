@@ -12,7 +12,7 @@ static double now_as_seconds() noexcept
 }
 
 int main()
-try {
+/* try */ {
     using clock_t = std::conditional_t<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>;
 
     Application app;
@@ -62,15 +62,21 @@ try {
         delta = now - last_update;
         last_update = now;
     }
-} catch (std::system_error& e) {
-    std::cerr << "Unhandled std::system_error:\n\t";
-    std::cerr << e.code().category().name() << ": (" << e.code().value() << ") " << e.code().message() << std::endl;
-    exit(EXIT_FAILURE);
-} catch (std::exception& e) {
-    std::cerr << "Unhandled std::exception:\n\t";
-    std::cerr << e.what() << std::endl;
-    exit(EXIT_FAILURE);
-} catch (...) {
-    std::cerr << "Unhandled unknown exception, rethrowing." << std::endl;
-    throw;
+
+    // the debugger is not showing the callstack of the exception
+    // and for some reason, std::cerr and std::clog don't want to work.
+    // so im just going to let the debugger automatically catch the exceptions
+
+    // } catch (std::system_error& e) {
+    //     std::cout << "Unhandled std::system_error:\n\t";
+    //     std::cout << e.code().category().name() << ": (" << e.code().value() << ") " << e.code().message() << std::endl;
+    //     throw;
+    // } catch (std::exception& e) {
+    //     std::cout << "Unhandled std::exception:\n\t";
+    //     std::cout << e.what() << std::endl;
+    //     throw;
+    // } catch (...) {
+    //     std::cout << "Unhandled unknown exception, rethrowing." << std::endl;
+    //     throw;
+    // }
 }

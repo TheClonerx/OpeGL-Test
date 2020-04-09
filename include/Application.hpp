@@ -7,6 +7,7 @@
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
+#include <Utilities.hpp>
 
 class Application {
 public:
@@ -33,4 +34,5 @@ private:
     sf::RenderWindow m_window;
 
     bool m_needs_redraw = true;
+    std::vector<std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> m_imgui_info;
 };

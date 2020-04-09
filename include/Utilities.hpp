@@ -1,7 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
+#include <string>
 #include <string_view>
+#include <vector>
 
 namespace tcx { // here i place my stuff
 
@@ -26,4 +29,54 @@ private:
     std::string_view m_name;
 };
 
+inline std::string_view lstrip(std::string_view s)
+{
+    while (!s.empty() && std::isspace(s.front()))
+        s.remove_prefix(1);
+    return s;
+}
+
+inline std::string_view rstrip(std::string_view s)
+{
+    while (!s.empty() && std::isspace(s.back()))
+        s.remove_suffix(1);
+    return s;
+}
+
+inline std::string_view strip(std::string_view s)
+{
+    return lstrip(rstrip(s));
+}
+
+inline std::string_view lstrip(std::string_view s, std::string_view chars)
+{
+    while (!s.empty() && std::find(chars.cbegin(), chars.cend(), s.front()) != chars.cend())
+        s.remove_prefix(1);
+    return s;
+}
+
+inline std::string_view rstrip(std::string_view s, std::string_view chars)
+{
+    while (!s.empty() && std::find(chars.crbegin(), chars.crend(), s.front()) != chars.crend())
+        s.remove_prefix(1);
+    return s;
+}
+
+inline std::string_view strip(std::string_view s, std::string_view chars)
+{
+    return lstrip(rstrip(s, chars), chars);
+}
+
+inline bool startswith(std::string_view hay, std::string_view needle)
+{
+    return hay.size() >= needle.size() && hay.substr(0, needle.size()) == needle;
+}
+
+inline bool endswith(std::string_view hay, std::string_view needle)
+{
+    return hay.size() >= needle.size() && hay.substr(hay.size() - needle.size()) == needle;
+}
+
+std::vector<std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> parse_ini(std::string_view name);
+std::vector<std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> parse_ini(std::istream& is);
 }

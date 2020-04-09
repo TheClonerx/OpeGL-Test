@@ -54,8 +54,8 @@ void Application::setupOpenGL()
         fragment_shader.create();
         vertex_shader.create();
 
-        fragment_shader.source(get_file("fragment.glsl"));
-        vertex_shader.source(get_file("vertex.glsl"));
+        fragment_shader.source(get_file("assets/fragment.glsl"));
+        vertex_shader.source(get_file("assets/vertex.glsl"));
 
         if (!fragment_shader.compile())
             std::cerr << "Error compiling the fragment shader:\n\t" << fragment_shader.info_log() << '\n';
@@ -104,8 +104,8 @@ void Application::setupOpenGL()
         6, 8, 7,
         9, 11, 10,
 
-        11 + 1, 11 + 2, 11 + 3,
-        11 + 2, 11 + 4, 11 + 3
+        14, 13, 12,
+        14, 15, 13
     };
 
     vertex_array.create();
@@ -136,8 +136,8 @@ void Application::setupOpenGL()
     texture1.bind();
     texture1.parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
     texture1.parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-    texture1.parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    texture1.parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texture1.parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    texture1.parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     texture1.image(0, GL_RGBA, m_pinera.getSize().x, m_pinera.getSize().y, GL_RGBA, GL_UNSIGNED_BYTE, m_pinera.getPixelsPtr());
 }
@@ -154,6 +154,7 @@ void Application::setup()
 
     m_window.create({ 800, 600 }, "OpenGL-Test", sf::Style::Default, context_settings);
     m_window.setActive();
+    m_window.setKeyRepeatEnabled(false);
     if (int error = glewInit(); error != GLEW_OK) {
         std::fprintf(stderr, "Error initializing GLEW: (%d) %s\n", error, glewGetErrorString(error));
         std::exit(EXIT_FAILURE);
@@ -164,11 +165,14 @@ void Application::setup()
         if (!m_tcx_image.loadFromFile("assets/theclonerx.png"))
             throw std::runtime_error("Can't load theclonerx image");
     }
-
     {
         tcx::TimeIt timer = "assets/avatar-pinera.png"sv;
         if (!m_pinera.loadFromFile("assets/avatar-pinera.png"))
             throw std::runtime_error("Can't load pinera image");
+    }
+    {
+        tcx::TimeIt timer = "tcx::parse_ini(\"imgui.ini\");"sv;
+        m_imgui_info = tcx::parse_ini("imgui.ini");
     }
     m_window.setIcon(m_tcx_image.getSize().x, m_tcx_image.getSize().y, m_tcx_image.getPixelsPtr());
 

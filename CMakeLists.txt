@@ -31,7 +31,9 @@ set(IMGUI_PUBLIC_SOURCES ${IMGUI_DIR}/imconfig.h ${IMGUI_DIR}/imgui.h)
 add_library(OpenGL-Utils STATIC)
 target_compile_features(OpenGL-Utils PUBLIC cxx_std_17)
 target_include_directories(OpenGL-Utils PUBLIC include)
-target_link_libraries(OpenGL-Utils PUBLIC libglew_static OpenGL::OpenGL)
+target_link_libraries(
+    OpenGL-Utils PUBLIC libglew_static OpenGL::OpenGL glm::glm
+)
 target_sources(
     OpenGL-Utils
     PRIVATE src/OpenGL/Object.cpp src/OpenGL/Shader.cpp
@@ -57,11 +59,23 @@ target_sources(
     PUBLIC include/ImGui.hpp
 )
 
+add_library(Utilities STATIC)
+target_compile_features(Utilities PUBLIC cxx_std_17)
+target_include_directories(Utilities PUBLIC include)
+# target_link_libraries(Utilities PUBLIC glm::glm)
+target_sources(
+    Utilities
+    PRIVATE src/Utilities/ParseINI.cpp
+            # src/Utilities/ParseOBJ.cpp
+    PUBLIC include/Utilities.hpp
+)
+
 add_executable(main)
 target_compile_features(main PRIVATE cxx_std_17)
 target_include_directories(main PRIVATE include)
-target_link_libraries(main PRIVATE OpenGL-Utils ImGui-Bindings sfml-window)
-
+target_link_libraries(
+    main PRIVATE OpenGL-Utils ImGui-Bindings sfml-window Utilities
+)
 target_sources(
     main PRIVATE src/main.cpp src/Application.cpp src/ApplicationLogic.cpp
 )
