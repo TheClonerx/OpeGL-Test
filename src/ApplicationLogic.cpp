@@ -10,15 +10,17 @@ static float fov = glm::radians(60.0f);
 static int max_frame_rate = 60;
 static double last_frame;
 
-static bool debug_window = true;
+static bool debug_windows = true;
 
 void Application::update(double delta)
 {
-    if (debug_window) {
-        if (ImGui::Begin("Debug###DEBUG_WINDOW", &debug_window)) {
+    if (debug_windows) {
+        if (ImGui::Begin("Debug###DEBUG_WINDOW", &debug_windows)) {
             ImGui::SliderAngle("FOV", &fov, 1, 180, "%.3f deg");
             ImGui::SliderInt("Max Frame Rate", &max_frame_rate, 5, 145, max_frame_rate == 145 ? " Unlimited" : "%d fps");
-            if (ImGui::BeginChild("ImGui Info")) {
+        ImGui::End();
+
+        if (ImGui::Begin("ImGui INI", &debug_windows)) {
                 for (const auto& [section, values] : m_imgui_info) {
                     if (ImGui::TreeNode(&section, "[%s]", section.c_str())) {
                         for (const auto& [key, value] : values) {
@@ -32,8 +34,6 @@ void Application::update(double delta)
                     }
                 }
             }
-            ImGui::EndChild();
-        }
         ImGui::End();
     }
 
@@ -55,7 +55,7 @@ void Application::on_event(const sf::Event& event)
         m_window.close();
     } else if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::F3) {
-            debug_window = !debug_window;
+            debug_windows = !debug_windows;
         }
     }
 }

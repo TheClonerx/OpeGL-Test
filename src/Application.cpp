@@ -178,10 +178,5 @@ void Application::setup()
 
     m_tcx_image.flipVertically(); // for opengl
     m_pinera.flipVertically();
-
-    // imgui-SFML uses the default SFML opengl states
-    ImGui_Initialize();
-
-    m_window.pushGLStates(); // save the default sfml rendering context state
     setupOpenGL();
 }
