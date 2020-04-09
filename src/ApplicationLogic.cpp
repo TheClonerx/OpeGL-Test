@@ -1,12 +1,12 @@
 #include <Application.hpp>
 #include <array>
-#include <imgui-SFML.h>
+#include <ImGui.hpp>
 #include <imgui.h>
 #include <iostream>
 #include <ratio>
 
 static double elapsed;
-static float fov = glm::radians(40.0f);
+static float fov = glm::radians(60.0f);
 static int max_frame_rate = 60;
 static double last_frame;
 

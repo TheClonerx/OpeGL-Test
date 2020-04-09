@@ -1,4 +1,5 @@
 #include <Application.hpp>
+#include <ImGui.hpp>
 #include <OpenGL/GL.hpp>
 #include <SFML/Window/Event.hpp>
 #include <chrono>
@@ -9,8 +10,6 @@ static double now_as_seconds() noexcept
 {
     return std::chrono::duration_cast<std::chrono::duration<double>>(Clock::now().time_since_epoch()).count();
 }
-
-#include <imgui-SFML.h>
 
 int main()
 try {
@@ -24,10 +23,12 @@ try {
 
     bool running = true;
 
+    ImGuiContext* imgui_context = ImGui_Initialize();
+
     while (running) {
         sf::Event event;
         while (app.window().pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
+            ImGui_Event(imgui_context, event);
 
             app.on_event(event);
 
@@ -38,25 +39,24 @@ try {
         if (!running)
             break;
 
-        ImGui::SFML::Update(app.window(), sf::seconds(delta));
+        ImGui_Update(imgui_context, app.window(), static_cast<float>(delta));
 
+        ImGui::NewFrame();
         app.update(delta);
         if (!running)
             break;
 
         bool needs_redraw = app.needs_redraw();
 
-        if (needs_redraw) {
-            //app.window().clear();
-            app.render();
-        }
-
-        app.window().popGLStates();
-        ImGui::SFML::Render(app.window());
-        app.window().pushGLStates();
-
         if (needs_redraw)
+            app.render();
+
+        ImGui::EndFrame();
+
+        if (needs_redraw) {
+            ImGui_Render(imgui_context); // draws to the active OpenGL context
             app.window().display();
+        }
 
         double now = now_as_seconds<clock_t>();
         delta = now - last_update;

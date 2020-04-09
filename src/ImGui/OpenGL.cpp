@@ -2,7 +2,9 @@
 #include <imgui.h>
 #include <string_view>
 
-static const std::string_view g_imgui_vertex_shader_source = R"GLSL(
+using namespace std::literals;
+
+static const auto g_imgui_vertex_shader_source = R"GLSL(
     #version 330 core
     layout (location = 0) in vec2 v_position;
     layout (location = 1) in vec2 v_uv;
@@ -18,9 +20,9 @@ static const std::string_view g_imgui_vertex_shader_source = R"GLSL(
         f_color = v_color;
         gl_Position = v_projection_matrix * vec4(v_position, 0, 1);
     }
-)GLSL";
+)GLSL"sv;
 
-static const std::string_view g_imgui_fragment_shader_source = R"GLSL(
+static const auto g_imgui_fragment_shader_source = R"GLSL(
     #version 330 core
 
     in vec2 f_uv;
@@ -33,7 +35,7 @@ static const std::string_view g_imgui_fragment_shader_source = R"GLSL(
     void main() {
         out_color = f_color * texture(texture0, f_uv);
     }
-)GLSL";
+)GLSL"sv;
 
 #include <OpenGL/Buffer.hpp>
 #include <OpenGL/Shader.hpp>
@@ -91,7 +93,7 @@ static bool ImGui_Setup_FontsTexture(ImGuiIO& io)
     imgui_renderer_data.m_font_texture.parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     imgui_renderer_data.m_font_texture.image(0, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-    io.Fonts->TexID = reinterpret_cast<ImTextureID>(static_cast<intptr_t>(imgui_renderer_data.m_font_texture.handle()));
+    io.Fonts->TexID = reinterpret_cast<ImTextureID>(static_cast<std::uintptr_t>(imgui_renderer_data.m_font_texture.handle()));
     return true;
 }
 

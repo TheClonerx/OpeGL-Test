@@ -1,9 +1,9 @@
 #include <Application.hpp>
+#include <ImGui.hpp>
 #include <Utilities.hpp>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
-#include <imgui-SFML.h>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -176,7 +176,7 @@ void Application::setup()
     m_pinera.flipVertically();
 
     // imgui-SFML uses the default SFML opengl states
-    ImGui::SFML::Init(m_window, true);
+    ImGui_Initialize();
 
     m_window.pushGLStates(); // save the default sfml rendering context state
     setupOpenGL();
