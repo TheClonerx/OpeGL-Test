@@ -43,6 +43,8 @@ static const auto g_imgui_fragment_shader_source = R"GLSL(
 #include <OpenGL/Texture.hpp>
 #include <OpenGL/VertexArray.hpp>
 
+#include <spdlog/spdlog.h>
+
 struct ImGui_Renderer_Data {
     OpenGL::ShaderProgram m_shader_program;
     OpenGL::Texture m_font_texture;
@@ -64,16 +66,22 @@ static bool ImGui_Setup_Shaders(ImGuiIO& io)
     vertex_shader.source(g_imgui_vertex_shader_source);
     fragment_shader.source(g_imgui_fragment_shader_source);
 
-    if (!vertex_shader.compile())
+    if (!vertex_shader.compile()) {
+        spdlog::error("IMGUI-BINDINGS: Cannot compile vertex shader {}", vertex_shader.info_log());
         return false;
+    }
 
-    if (!fragment_shader.compile())
+    if (!fragment_shader.compile()) {
+        spdlog::error("IMGUI-BINDINGS: Cannot compile fragment shader {}", vertex_shader.info_log());
         return false;
+    }
 
     imgui_renderer_data.m_shader_program.attach(vertex_shader, fragment_shader);
 
-    if (!imgui_renderer_data.m_shader_program.link())
+    if (!imgui_renderer_data.m_shader_program.link()) {
+        spdlog::error("IMGUI-BINDINGS: Cannot link shader program {}", vertex_shader.info_log());
         return false;
+    }
 
     return true;
 }
@@ -83,17 +91,22 @@ static bool ImGui_Setup_FontsTexture(ImGuiIO& io)
     ImGui_Renderer_Data& imgui_renderer_data = *reinterpret_cast<ImGui_Renderer_Data*>(io.BackendRendererUserData);
     uint8_t* pixels;
     int width, height;
-    if (!io.Fonts->AddFontDefault())
+
+    constexpr auto font_path = "assets/fonts/Noto/NotoMono-Regular.ttf"sv;
+    if (!io.Fonts->AddFontFromFileTTF(font_path.data(), 15)) {
+        spdlog::error("IMGUI-BINDINGS: Can't load font {}", font_path);
         return false;
+    }
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
     imgui_renderer_data.m_font_texture.create();
     imgui_renderer_data.m_font_texture.bind();
-    imgui_renderer_data.m_font_texture.parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    imgui_renderer_data.m_font_texture.parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    imgui_renderer_data.m_font_texture.parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    imgui_renderer_data.m_font_texture.parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     imgui_renderer_data.m_font_texture.image(0, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     io.Fonts->TexID = reinterpret_cast<ImTextureID>(static_cast<std::uintptr_t>(imgui_renderer_data.m_font_texture.handle()));
+
     return true;
 }
 
@@ -128,6 +141,7 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImGui_Renderer_Data& imgui_render
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
 
     glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
     float L = draw_data->DisplayPos.x;

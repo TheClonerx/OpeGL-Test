@@ -58,10 +58,14 @@ target_sources(
 add_library(ImGui-Bindings STATIC)
 target_compile_features(ImGui-Bindings PUBLIC cxx_std_17)
 target_include_directories(ImGui-Bindings PUBLIC include)
-target_link_libraries(ImGui-Bindings PUBLIC imgui sfml-graphics OpenGL-Utils)
+target_link_libraries(
+    ImGui-Bindings
+    PUBLIC imgui sfml-graphics
+    PRIVATE OpenGL-Utils spdlog
+)
 target_sources(
     ImGui-Bindings
-    PRIVATE src/ImGui/Window.cpp src/ImGui/OpenGL.cpp
+    PRIVATE src/ImGui/SFML.cpp src/ImGui/OpenGL.cpp
     PUBLIC include/ImGui.hpp
 )
 

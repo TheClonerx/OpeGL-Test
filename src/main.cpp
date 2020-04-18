@@ -24,7 +24,7 @@ int main()
     bool running = true;
 
     ImGuiContext* imgui_context = ImGui_Initialize();
-
+    glClearColor(0, 0.25, 0.5, 1.0);
     while (running) {
         sf::Event event;
         while (app.window().pollEvent(event)) {

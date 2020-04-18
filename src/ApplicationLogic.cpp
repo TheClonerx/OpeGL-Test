@@ -12,12 +12,15 @@ static double last_frame;
 
 static bool debug_windows = true;
 
+static glm::vec4 clear_color {};
 void Application::update(double delta)
 {
     if (debug_windows) {
         if (ImGui::Begin("Debug###DEBUG_WINDOW", &debug_windows)) {
             ImGui::SliderAngle("FOV", &fov, 1, 180, "%.3f deg");
             ImGui::SliderInt("Max Frame Rate", &max_frame_rate, 5, 145, max_frame_rate == 145 ? " Unlimited" : "%d fps");
+            if (ImGui::ColorPicker4("Clear Color", glm::value_ptr(clear_color)))
+                glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         ImGui::End();
 
         if (ImGui::Begin("ImGui INI", &debug_windows)) {
@@ -72,10 +75,12 @@ void Application::render()
     glFrontFace(GL_CCW);
     glEnable(GL_CULL_FACE);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_SCISSOR_TEST);
 
-    glClearColor(0, 0.25, 0.5, 1.0);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glAlphaFunc(GL_EQUAL, 0.0f); // discard pixels with alpha equal to 0.0f
+    glEnable(GL_BLEND);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader_program.bind();

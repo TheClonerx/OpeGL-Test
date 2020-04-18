@@ -6,8 +6,7 @@
 
 #include <imgui.h>
 
-static std::array<sf::Cursor, ImGuiMouseCursor_COUNT> g_MouseCursors {};
-static bool g_MouseCursorsInitialized = false;
+static std::unique_ptr<sf::Cursor[]> g_MouseCursors {};
 static double g_Time;
 
 void ImGui_RenderDrawData(ImDrawData* draw_data);
@@ -16,10 +15,11 @@ void ImGui_CleanUp_OpenGL();
 
 static void initializeCursors()
 {
-    if (g_MouseCursorsInitialized)
+    if (g_MouseCursors)
         return;
 
     // they should default to array if the os doesn't support them
+    g_MouseCursors = std::make_unique<sf::Cursor[]>(ImGuiMouseCursor_COUNT);
 
     g_MouseCursors[ImGuiMouseCursor_Arrow].loadFromSystem(sf::Cursor::Type::Arrow);
     g_MouseCursors[ImGuiMouseCursor_TextInput].loadFromSystem(sf::Cursor::Type::Text);
@@ -30,8 +30,6 @@ static void initializeCursors()
     g_MouseCursors[ImGuiMouseCursor_ResizeNWSE].loadFromSystem(sf::Cursor::Type::SizeTopLeftBottomRight);
     g_MouseCursors[ImGuiMouseCursor_Hand].loadFromSystem(sf::Cursor::Type::Hand);
     g_MouseCursors[ImGuiMouseCursor_NotAllowed].loadFromSystem(sf::Cursor::Type::NotAllowed);
-
-    g_MouseCursorsInitialized = true;
 }
 
 ImGuiContext* ImGui_Initialize()
@@ -45,6 +43,8 @@ ImGuiContext* ImGui_Initialize()
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
     io.BackendPlatformName = "imgui_tcx_impl_for_sfml";
+
+    initializeCursors();
 
     static std::string clipboard_data;
     io.ClipboardUserData = &clipboard_data;
@@ -108,7 +108,6 @@ void ImGui_Update(ImGuiContext* imgui_context, sf::WindowBase& window, sf::Rende
 
 static void ImGui_Update_Mouse(ImGuiIO& io, sf::WindowBase& window)
 {
-
     // ImGui Mouse buttons: 0=left, 1=right, 2=middle + 2 extras.
     // SFML  Mouse buttons: 0=left, 1=right, 2=middle, 3=xbutton1, 4=xbutton2
     for (size_t i = 0; i < std::size(io.MouseDown); ++i)
@@ -171,6 +170,9 @@ static void ImGui_Event_KeyReleased(ImGuiIO& io, sf::Event::KeyEvent& event)
 
 static void ImGui_Event_TextEntered(ImGuiIO& io, sf::Event::TextEvent& event)
 {
+    if (event.unicode < ' ' || event.unicode == 127)
+        return;
+
     io.AddInputCharacter(event.unicode); // UTF-32
 }
 
