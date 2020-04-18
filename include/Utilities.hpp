@@ -2,12 +2,27 @@
 
 #include <algorithm>
 #include <chrono>
+#include <glm/glm.hpp>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace tcx { // here i place my stuff
 
+template <typename T>
+struct VectorHasher {
+};
+
+template <glm::length_t I, typename T, glm::qualifier Q>
+struct VectorHasher<glm::vec<I, T, Q>> {
+    static_assert(std::is_trivially_copyable_v<T>);
+    using result_type = std::size_t;
+    using argument_type = glm::vec<I, T, Q>;
+    result_type operator()(argument_type const& v) const noexcept
+    {
+        return std::hash<std::string_view> {}({ reinterpret_cast<char const*>(&v), sizeof(v) });
+    }
+};
 class TimeIt {
 public:
     TimeIt(std::string_view name)
