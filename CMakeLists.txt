@@ -72,7 +72,7 @@ target_sources(
 add_library(Utilities STATIC)
 target_compile_features(Utilities PUBLIC cxx_std_17)
 target_include_directories(Utilities PUBLIC include)
-# target_link_libraries(Utilities PUBLIC glm::glm)
+target_link_libraries(Utilities PUBLIC spdlog glm)
 target_sources(
     Utilities
     PRIVATE src/Utilities/ParseINI.cpp

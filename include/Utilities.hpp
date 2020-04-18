@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <chrono>
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -84,9 +85,10 @@ auto floor_division(glm::vec<I, T0, Q> const& x, T1 y) noexcept //calls floor_di
 
 class TimeIt {
 public:
-    TimeIt(std::string_view name)
+    template <typename... Args>
+    TimeIt(std::string_view format, Args&&... args)
         : m_start { clock_t::now() }
-        , m_name { name }
+        , m_name { fmt::format(format, std::forward<Args>(args)...) }
     {
     }
 
@@ -94,13 +96,13 @@ public:
     {
         auto stop = clock_t::now();
         auto delta = std::chrono::duration_cast<std::chrono::duration<double, std::micro>>(stop - m_start);
-        std::fwprintf(stderr, L"%.*s took %.3fμs\n", static_cast<int>(m_name.size()), m_name.data(), delta);
+        spdlog::info("{} took {}", m_name, delta.count());
     }
 
 private:
     using clock_t = std::conditional_t<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>;
     clock_t::time_point m_start;
-    std::string_view m_name;
+    std::string m_name;
 };
 
 inline std::string_view lstrip(std::string_view s)
