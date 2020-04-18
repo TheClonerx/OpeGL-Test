@@ -12,8 +12,14 @@ add_subdirectory(libs/glew-cmake)
 set(GLM_TEST_ENABLE OFF)
 add_subdirectory(libs/glm)
 
-set(SFML_STATIC_LIBRARIES TRUE)
+set(BUILD_SHARED_LIBS FALSE)
 add_subdirectory(libs/SFML)
+unset(BUILD_SHARED_LIBS)
+
+add_subdirectory(libs/fmt)
+
+set(SPDLOG_FMT_EXTERNAL TRUE)
+add_subdirectory(libs/spdlog)
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/libs/imgui)
 set(IMGUI_PRIVATE_SOURCES
