@@ -155,8 +155,9 @@ void Application::setup()
     m_window.create({ 800, 600 }, "OpenGL-Test", sf::Style::Default, context_settings);
     m_window.setActive();
     m_window.setKeyRepeatEnabled(false);
-    if (int error = glewInit(); error != GLEW_OK) {
-        std::fprintf(stderr, "Error initializing GLEW: (%d) %s\n", error, glewGetErrorString(error));
+    // TODO
+    if (!gladLoadGL()) {
+        std::fprintf(stderr, "Error initializing GLAD.\n");
         std::exit(EXIT_FAILURE);
     }
 

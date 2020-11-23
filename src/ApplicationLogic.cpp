@@ -1,6 +1,6 @@
 #include <Application.hpp>
-#include <array>
 #include <ImGui.hpp>
+#include <array>
 #include <imgui.h>
 #include <iostream>
 #include <ratio>
@@ -21,9 +21,9 @@ void Application::update(double delta)
             ImGui::SliderInt("Max Frame Rate", &max_frame_rate, 5, 145, max_frame_rate == 145 ? " Unlimited" : "%d fps");
             if (ImGui::ColorPicker4("Clear Color", glm::value_ptr(clear_color)))
                 glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        ImGui::End();
+            ImGui::End();
 
-        if (ImGui::Begin("ImGui INI", &debug_windows)) {
+            if (ImGui::Begin("ImGui INI", &debug_windows)) {
                 for (const auto& [section, values] : m_imgui_info) {
                     if (ImGui::TreeNode(&section, "[%s]", section.c_str())) {
                         for (const auto& [key, value] : values) {
@@ -37,7 +37,8 @@ void Application::update(double delta)
                     }
                 }
             }
-        ImGui::End();
+            ImGui::End();
+        }
     }
 
     elapsed += delta;
@@ -78,7 +79,7 @@ void Application::render()
     glDisable(GL_SCISSOR_TEST);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glAlphaFunc(GL_EQUAL, 0.0f); // discard pixels with alpha equal to 0.0f
+    // glAlphaFunc(GL_EQUAL, 0.0f); // discard pixels with alpha equal to 0.0f
     glEnable(GL_BLEND);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -94,6 +95,7 @@ void Application::render()
 
     glm::mat4 model = glm::rotate(glm::mat4 { 1.0f }, glm::radians(static_cast<float>(elapsed * 100)), glm::vec3 { 0.0, 1.0, 0.0 });
     glm::mat4 projection = glm::perspectiveFov(fov, static_cast<float>(viewport.z), static_cast<float>(viewport.w), 0.1f, 100.0f);
+    glm::mat4 view { 1.0f };
 
     shader_program.uniform("modelMatrix", model);
     shader_program.uniform("viewMatrix", view);

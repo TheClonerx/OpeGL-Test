@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include <OpenGL/GL.hpp>
 #include <OpenGL/VertexArray.hpp>
 #include <array>
 

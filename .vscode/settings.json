@@ -60,6 +60,19 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "format": "cpp",
+        "bitset": "cpp",
+        "compare": "cpp",
+        "complex": "cpp",
+        "concepts": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "ranges": "cpp",
+        "shared_mutex": "cpp",
+        "stop_token": "cpp"
+    },
+    "cmake.debugConfig": {
+        "cwd": "${workspaceFolder}"
     }
 }

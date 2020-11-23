@@ -59,8 +59,12 @@ public:
 
 using FragmentShader = Shader<GL_FRAGMENT_SHADER>;
 using VertexShader = Shader<GL_VERTEX_SHADER>;
-using ComputeShader = Shader<GL_COMPUTE_SHADER>;
 using GeometryShader = Shader<GL_GEOMETRY_SHADER>;
+#ifdef GL_COMPUTE_SHADER
+using ComputeShader = Shader<GL_COMPUTE_SHADER>;
+#endif
+#ifdef GL_TESS_CONTROL_SHADER
 using TessControlShader = Shader<GL_TESS_CONTROL_SHADER>;
+#endif
 
 } // namespace OpenGL

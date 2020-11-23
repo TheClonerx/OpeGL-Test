@@ -59,19 +59,23 @@ void OpenGL::VertexShader::create() noexcept
 }
 
 template <>
-void OpenGL::ComputeShader::create() noexcept
-{
-    m_handle = glCreateShader(GL_COMPUTE_SHADER);
-}
-
-template <>
 void OpenGL::GeometryShader::create() noexcept
 {
     m_handle = glCreateShader(GL_GEOMETRY_SHADER);
 }
 
+#ifdef GL_COMPUTE_SHADER
+template <>
+void OpenGL::ComputeShader::create() noexcept
+{
+    m_handle = glCreateShader(GL_COMPUTE_SHADER);
+}
+
+#endif
+#ifdef GL_TESS_CONTROL_SHADER
 template <>
 void OpenGL::TessControlShader::create() noexcept
 {
     m_handle = glCreateShader(GL_TESS_CONTROL_SHADER);
 }
+#endif

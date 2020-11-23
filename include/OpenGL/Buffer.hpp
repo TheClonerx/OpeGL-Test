@@ -1,5 +1,5 @@
 #pragma once
-#include <OpenGL/GL.hpp>
+#include <OpenGL/BindGuard.hpp>
 #include <OpenGL/Object.hpp>
 #include <iterator>
 #include <type_traits>
@@ -37,7 +37,12 @@ public:
     auto data(It start, It stop, int usage) noexcept -> std::enable_if_t<std::is_trivially_copyable_v<typename std::iterator_traits<It>::value_type>>
     {
         if constexpr (std::is_pointer_v<It>) {
+#ifdef glNamedBufferData
             glNamedBufferData(m_handle, reinterpret_cast<const char*>(stop) - reinterpret_cast<const char*>(start), start, usage);
+#else
+            bind();
+            glBufferData(Target, reinterpret_cast<const char*>(stop) - reinterpret_cast<const char*>(start), start, usage);
+#endif
         } else {
             std::vector<typename std::iterator_traits<It>::value_type> dat(start, stop);
             data(dat.data(), dat.data() + dat.size(), usage);
@@ -45,7 +50,7 @@ public:
     }
 
     template <typename T>
-    auto data(T&& dat, int usage) noexcept
+    auto data(T const& dat, int usage) noexcept
     {
         return data(std::begin(dat), std::end(dat), usage);
     }

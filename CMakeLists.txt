@@ -1,58 +1,67 @@
 cmake_minimum_required(VERSION 3.15)
-project(OpenGL-Test)
+project(OpenGL-Test C CXX)
 
 # find_package(fmt REQUIRED) # not yet needed
-find_package(OpenGL REQUIRED) # use system one, there's basically no other
-                              # choice
+find_package(SDL2 REQUIRED)
+find_package(SFML 2.5 REQUIRED COMPONENTS window)
 
-set(ONLY_LIBS ON)
-set(BUILD_UTILS OFF)
-add_subdirectory(libs/glew-cmake)
+add_subdirectory(libs/glad)
 
-set(GLM_TEST_ENABLE OFF)
-add_subdirectory(libs/glm)
+include(FetchContent)
 
-set(BUILD_SHARED_LIBS FALSE)
-add_subdirectory(libs/SFML)
-unset(BUILD_SHARED_LIBS)
+FetchContent_Declare(glm URL https://github.com/g-truc/glm/archive/0.9.9.8.zip)
+option(GLM_TEST_ENABLE "" OFF)
+FetchContent_MakeAvailable(glm)
 
-add_subdirectory(libs/fmt)
+# set(BUILD_SHARED_LIBS FALSE) add_subdirectory(libs/SFML)
+# unset(BUILD_SHARED_LIBS)
 
-set(SPDLOG_FMT_EXTERNAL TRUE)
-add_subdirectory(libs/spdlog)
+FetchContent_Declare(fmt URL https://github.com/fmtlib/fmt/archive/7.1.2.zip)
+FetchContent_MakeAvailable(fmt)
 
-set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/libs/imgui)
-set(IMGUI_PRIVATE_SOURCES
-    ${IMGUI_DIR}/imgui_demo.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_internal.h
-    ${IMGUI_DIR}/imgui_widgets.cpp
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imstb_rectpack.h
-    ${IMGUI_DIR}/imstb_textedit.h
-    ${IMGUI_DIR}/imstb_truetype.h
+FetchContent_Declare(
+    spdlog URL https://github.com/gabime/spdlog/archive/v1.8.1.zip
 )
-set(IMGUI_PUBLIC_SOURCES ${IMGUI_DIR}/imconfig.h ${IMGUI_DIR}/imgui.h)
+set(SPDLOG_FMT_EXTERNAL TRUE)
+FetchContent_MakeAvailable(spdlog)
+
+FetchContent_Declare(
+    imgui URL https://github.com/ocornut/imgui/archive/v1.79.zip
+)
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+    FetchContent_Populate(imgui)
+    set(IMGUI_PRIVATE_SOURCES
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_internal.h
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imstb_rectpack.h
+        ${imgui_SOURCE_DIR}/imstb_textedit.h
+        ${imgui_SOURCE_DIR}/imstb_truetype.h
+    )
+    set(IMGUI_PUBLIC_SOURCES ${imgui_SOURCE_DIR}/imconfig.h
+                             ${imgui_SOURCE_DIR}/imgui.h
+    )
+    add_library(imgui STATIC)
+    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+    target_sources(
+        imgui
+        PRIVATE ${IMGUI_PRIVATE_SOURCES}
+        PUBLIC ${IMGUI_PUBLIC_SOURCERS}
+    )
+endif()
 
 add_library(OpenGL-Utils STATIC)
 target_compile_features(OpenGL-Utils PUBLIC cxx_std_17)
 target_include_directories(OpenGL-Utils PUBLIC include)
-target_link_libraries(
-    OpenGL-Utils PUBLIC libglew_static OpenGL::OpenGL glm::glm
-)
+target_link_libraries(OpenGL-Utils PUBLIC glad glm)
 target_sources(
     OpenGL-Utils
     PRIVATE src/OpenGL/Object.cpp src/OpenGL/Shader.cpp
-            src/OpenGL/ShaderProgram.cpp src/OpenGL/Buffer.cpp
-            src/OpenGL/VertexArray.cpp src/OpenGL/Texture.cpp
-)
-
-add_library(imgui STATIC)
-target_include_directories(imgui PUBLIC ${IMGUI_DIR})
-target_sources(
-    imgui
-    PRIVATE ${IMGUI_PRIVATE_SOURCES}
-    PUBLIC ${IMGUI_PUBLIC_SOURCERS}
+            src/OpenGL/ShaderProgram.cpp src/OpenGL/VertexArray.cpp
+            src/OpenGL/Texture.cpp
 )
 
 add_library(ImGui-Bindings STATIC)

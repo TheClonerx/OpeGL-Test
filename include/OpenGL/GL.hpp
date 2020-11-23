@@ -1,1 +1,2 @@
-#include <GL/glew.h>
+#pragma once
+#include <glad/glad.h>

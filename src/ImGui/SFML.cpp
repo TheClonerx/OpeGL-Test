@@ -2,7 +2,7 @@
 #include <SFML/Window/Clipboard.hpp>
 #include <SFML/Window/Cursor.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Window/WindowBase.hpp>
+#include <SFML/Window/Window.hpp>
 
 #include <imgui.h>
 
@@ -93,9 +93,9 @@ void ImGui_Render(ImGuiContext* imgui_context)
         ImGui_RenderDrawData(data);
 }
 
-static void ImGui_Update_Mouse(ImGuiIO& io, sf::WindowBase& window);
-static void ImGui_Update_Cursor(ImGuiIO& io, sf::WindowBase& window);
-void ImGui_Update(ImGuiContext* imgui_context, sf::WindowBase& window, sf::RenderTarget& target, float delta)
+static void ImGui_Update_Mouse(ImGuiIO& io, sf::Window& window);
+static void ImGui_Update_Cursor(ImGuiIO& io, sf::Window& window);
+void ImGui_Update(ImGuiContext* imgui_context, sf::Window& window, sf::RenderTarget& target, float delta)
 {
     ImGui::SetCurrentContext(imgui_context);
     ImGuiIO& io = ImGui::GetIO();
@@ -106,7 +106,7 @@ void ImGui_Update(ImGuiContext* imgui_context, sf::WindowBase& window, sf::Rende
     ImGui_Update_Cursor(io, window);
 }
 
-static void ImGui_Update_Mouse(ImGuiIO& io, sf::WindowBase& window)
+static void ImGui_Update_Mouse(ImGuiIO& io, sf::Window& window)
 {
     // ImGui Mouse buttons: 0=left, 1=right, 2=middle + 2 extras.
     // SFML  Mouse buttons: 0=left, 1=right, 2=middle, 3=xbutton1, 4=xbutton2
@@ -126,7 +126,7 @@ static void ImGui_Update_Mouse(ImGuiIO& io, sf::WindowBase& window)
     //}
 }
 
-static void ImGui_Update_Cursor(ImGuiIO& io, sf::WindowBase& window)
+static void ImGui_Update_Cursor(ImGuiIO& io, sf::Window& window)
 {
     if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) /*|| glfwGetInputMode(m_impl_window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED*/)
         return;

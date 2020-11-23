@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include <OpenGL/GL.hpp>
 #include <OpenGL/Texture.hpp>
 #include <array>
 
