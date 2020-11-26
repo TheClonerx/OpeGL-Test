@@ -1,6 +1,7 @@
 #include <Application.hpp>
-#include <ImGui.hpp>
+#include <SDL.h>
 #include <array>
+#include <glm/gtx/io.hpp>
 #include <imgui.h>
 #include <iostream>
 #include <ratio>
@@ -53,18 +54,14 @@ void Application::update(double delta)
     }
 }
 
-void Application::on_event(const sf::Event& event)
+void Application::on_event(const SDL_Event& event)
 {
-    if (event.type == sf::Event::Closed) {
-        m_window.close();
-    } else if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::F3) {
+    if (event.type == SDL_KEYDOWN) {
+        if (event.key.keysym.scancode == SDL_SCANCODE_F3) {
             debug_windows = !debug_windows;
         }
     }
 }
-
-#include <glm/gtx/io.hpp>
 
 void Application::render()
 {

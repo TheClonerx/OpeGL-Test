@@ -1,9 +1,9 @@
 #include <Application.hpp>
-#include <ImGui.hpp>
 #include <Utilities.hpp>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <imgui.h>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -31,7 +31,7 @@ std::string get_file(std::string_view path)
     return content;
 }
 
-sf::RenderWindow& Application::window() noexcept
+SDL_Window* Application::window() noexcept
 {
     return m_window;
 }
@@ -144,19 +144,25 @@ void Application::setupOpenGL()
 
 void Application::setup()
 {
-    sf::ContextSettings context_settings;
-    context_settings.majorVersion = 3;
-    context_settings.minorVersion = 3;
-    context_settings.depthBits = 24;
-#ifndef NDEBUG
-    context_settings.attributeFlags |= sf::ContextSettings::Attribute::Debug;
-#endif
 
-    m_window.create({ 800, 600 }, "OpenGL-Test", sf::Style::Default, context_settings);
-    m_window.setActive();
-    m_window.setKeyRepeatEnabled(false);
-    // TODO
-    if (!gladLoadGL()) {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    // #ifndef NDEBUG
+    //     context_settings.attributeFlags |= sf::ContextSettings::Attribute::Debug;
+    // #endif
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    m_window = SDL_CreateWindow("OpenGL-Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+
+    m_glctx = SDL_GL_CreateContext(m_window);
+    SDL_GL_MakeCurrent(m_window, m_glctx);
+    // SDL_GL_SetSwapInterval(1); // Enable vsync
+
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
         std::fprintf(stderr, "Error initializing GLAD.\n");
         std::exit(EXIT_FAILURE);
     }
@@ -175,7 +181,11 @@ void Application::setup()
         tcx::TimeIt timer = "tcx::parse_ini(\"imgui.ini\");"sv;
         m_imgui_info = tcx::parse_ini("imgui.ini");
     }
-    m_window.setIcon(m_tcx_image.getSize().x, m_tcx_image.getSize().y, m_tcx_image.getPixelsPtr());
+
+    // a view, does not copy the pixel data
+    SDL_Surface* icon = SDL_CreateRGBSurfaceWithFormatFrom(const_cast<void*>(static_cast<void const*>(m_tcx_image.getPixelsPtr())), m_tcx_image.getSize().x, m_tcx_image.getSize().y, 32, 4 * m_tcx_image.getSize().x, SDL_PIXELFORMAT_RGBA32);
+    SDL_SetWindowIcon(m_window, icon);
+    SDL_FreeSurface(icon);
 
     m_tcx_image.flipVertically(); // for opengl
     m_pinera.flipVertically();

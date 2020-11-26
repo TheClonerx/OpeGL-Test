@@ -1,8 +1,9 @@
 #include <Application.hpp>
-#include <ImGui.hpp>
 #include <OpenGL/GL.hpp>
-#include <SFML/Window/Event.hpp>
 #include <chrono>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl.h>
 #include <iostream>
 
 template <typename Clock>
@@ -12,36 +13,51 @@ static double now_as_seconds() noexcept
 }
 
 int main()
-/* try */ {
-    using clock_t = std::conditional_t<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>;
+{
+    using clock_type = std::conditional_t<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>;
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        std::fprintf(stderr, "SDL Error: %s\n", SDL_GetError());
+        std::exit(EXIT_FAILURE);
+    }
 
     Application app;
     app.setup();
 
-    double last_update = now_as_seconds<clock_t>();
+    double last_update = now_as_seconds<clock_type>();
     double delta = 0;
 
     bool running = true;
 
-    ImGuiContext* imgui_context = ImGui_Initialize();
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplSDL2_InitForOpenGL(app.window(), nullptr);
+    ImGui_ImplOpenGL3_Init(nullptr);
+
     glClearColor(0, 0.25, 0.5, 1.0);
+    SDL_Event event;
     while (running) {
-        sf::Event event;
-        while (app.window().pollEvent(event)) {
-            ImGui_Event(imgui_context, event);
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
 
             app.on_event(event);
 
-            if (!app.window().isOpen()) { // window.close() may be called
+            if (event.type == SDL_QUIT)
                 running = false;
-            }
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(app.window()))
+                running = false;
+
+            if (!running)
+                break;
         }
         if (!running)
             break;
 
-        ImGui_Update(imgui_context, app.window(), static_cast<float>(delta));
-
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(app.window());
         ImGui::NewFrame();
+
         app.update(delta);
         if (!running)
             break;
@@ -54,29 +70,19 @@ int main()
         ImGui::EndFrame();
 
         if (needs_redraw) {
-            ImGui_Render(imgui_context); // draws to the active OpenGL context
-            app.window().display();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            SDL_GL_SwapWindow(app.window());
         }
 
-        double now = now_as_seconds<clock_t>();
+        double now = now_as_seconds<clock_type>();
         delta = now - last_update;
         last_update = now;
     }
 
-    // the debugger is not showing the callstack of the exception
-    // and for some reason, std::cerr and std::clog don't want to work.
-    // so im just going to let the debugger automatically catch the exceptions
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 
-    // } catch (std::system_error& e) {
-    //     std::cout << "Unhandled std::system_error:\n\t";
-    //     std::cout << e.code().category().name() << ": (" << e.code().value() << ") " << e.code().message() << std::endl;
-    //     throw;
-    // } catch (std::exception& e) {
-    //     std::cout << "Unhandled std::exception:\n\t";
-    //     std::cout << e.what() << std::endl;
-    //     throw;
-    // } catch (...) {
-    //     std::cout << "Unhandled unknown exception, rethrowing." << std::endl;
-    //     throw;
-    // }
+    SDL_Quit();
 }

@@ -4,9 +4,8 @@
 #include <OpenGL/ShaderProgram.hpp>
 #include <OpenGL/Texture.hpp>
 #include <OpenGL/VertexArray.hpp>
+#include <SDL.h>
 #include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
 #include <Utilities.hpp>
 
 class Application {
@@ -14,8 +13,8 @@ public:
     void render();
     void update(double);
     void setup();
-    void on_event(const sf::Event&);
-    sf::RenderWindow& window() noexcept;
+    void on_event(SDL_Event const&);
+    SDL_Window* window() noexcept;
     bool needs_redraw() const noexcept;
 
 private:
@@ -31,7 +30,8 @@ private:
     sf::Image m_pinera;
 
     // window stuff
-    sf::RenderWindow m_window;
+    SDL_Window* m_window;
+    SDL_GLContext m_glctx;
 
     bool m_needs_redraw = true;
     std::vector<std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> m_imgui_info;

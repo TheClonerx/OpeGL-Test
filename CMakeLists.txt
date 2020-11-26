@@ -40,12 +40,17 @@ if(NOT imgui_POPULATED)
         ${imgui_SOURCE_DIR}/imstb_rectpack.h
         ${imgui_SOURCE_DIR}/imstb_textedit.h
         ${imgui_SOURCE_DIR}/imstb_truetype.h
+
+        ${imgui_SOURCE_DIR}/examples/imgui_impl_opengl3.cpp
+        ${imgui_SOURCE_DIR}/examples/imgui_impl_sdl.cpp
     )
     set(IMGUI_PUBLIC_SOURCES ${imgui_SOURCE_DIR}/imconfig.h
                              ${imgui_SOURCE_DIR}/imgui.h
     )
     add_library(imgui STATIC)
-    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/examples)
+    target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+    target_link_libraries(imgui PRIVATE glad SDL2::SDL2)
     target_sources(
         imgui
         PRIVATE ${IMGUI_PRIVATE_SOURCES}
@@ -64,20 +69,6 @@ target_sources(
             src/OpenGL/Texture.cpp
 )
 
-add_library(ImGui-Bindings STATIC)
-target_compile_features(ImGui-Bindings PUBLIC cxx_std_17)
-target_include_directories(ImGui-Bindings PUBLIC include)
-target_link_libraries(
-    ImGui-Bindings
-    PUBLIC imgui sfml-graphics
-    PRIVATE OpenGL-Utils spdlog
-)
-target_sources(
-    ImGui-Bindings
-    PRIVATE src/ImGui/SFML.cpp src/ImGui/OpenGL.cpp
-    PUBLIC include/ImGui.hpp
-)
-
 add_library(Utilities STATIC)
 target_compile_features(Utilities PUBLIC cxx_std_17)
 target_include_directories(Utilities PUBLIC include)
@@ -85,7 +76,6 @@ target_link_libraries(Utilities PUBLIC spdlog glm)
 target_sources(
     Utilities
     PRIVATE src/Utilities/ParseINI.cpp
-            # src/Utilities/ParseOBJ.cpp
     PUBLIC include/Utilities.hpp
 )
 
@@ -93,7 +83,7 @@ add_executable(main)
 target_compile_features(main PRIVATE cxx_std_17)
 target_include_directories(main PRIVATE include)
 target_link_libraries(
-    main PRIVATE OpenGL-Utils ImGui-Bindings sfml-window Utilities
+    main PRIVATE OpenGL-Utils sfml-graphics Utilities SDL2::SDL2 imgui
 )
 target_sources(
     main PRIVATE src/main.cpp src/Application.cpp src/ApplicationLogic.cpp
